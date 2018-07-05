@@ -21,6 +21,7 @@
 #include "emp-tool/utils/constants.h"
 #include "emp-tool/utils/hash.h"
 #include "emp-tool/utils/prg.h"
+#include "emp-tool/utils/dgs.h"
 #include "emp-tool/utils/prp.h"
 #include "emp-tool/utils/utils.h"
 #include "emp-tool/utils/utils_ec.h"

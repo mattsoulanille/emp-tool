@@ -6,11 +6,25 @@
 #include "emp-tool/utils/utils_ec.h"
 #include <gmp.h>
 #include <random>
+#include <math.h>
+#include <mpfr.h>
+
 
 #ifdef EMP_USE_RANDOM_DEVICE
 #else
 #include <x86intrin.h>
 #endif
+
+
+
+namespace emp {
+	class PRG;
+}
+#ifndef DGS_H__
+#include "emp-tool/utils/dgs.h"
+#endif
+
+	
 
 
 /** @addtogroup BP
@@ -149,7 +163,8 @@ class PRG { public:
 		mpz_import(out, nbytes, 1, 1, 0, 0, data);
 		delete [] data;
 	}
-
+	// similar to mpz_urandomm
+	// generates a random integer in [0, n)
 	void random_mpz(mpz_t rop, const mpz_t n) {
 		auto size = mpz_sizeinbase(n, 2);
 		while (1) {
@@ -159,6 +174,42 @@ class PRG { public:
 			}
 		}
 	}
+
+	// Post: sets 'out' to be a random mpf_t in [0, 1)
+	void random_mpf(mpf_t out, int nbits) {
+		mpz_t rop;
+		mpz_init(rop);
+		random_mpz(rop, nbits);
+		mpf_t dividend;
+		mpf_init(dividend);
+		mpf_set_z(dividend, rop);
+		mpf_t divisor;
+		mpf_init(divisor);
+		mpf_set_si(divisor, 2);
+		mpf_pow_ui(divisor, divisor, nbits); // 2 ** nbits
+		mpf_div(out, dividend, divisor);
+		
+	}
+	// similar to mpfr_urandomb
+	void random_mpfr(mpfr_t out, int nbits) {
+		mpz_t rop;
+		mpz_init(rop);
+		random_mpz(rop, nbits);
+		mpfr_t dividend;
+		mpfr_init(dividend);
+		mpfr_set_z(dividend, rop, MPFR_RNDN);
+		mpfr_t divisor;
+		mpfr_init(divisor);
+		mpfr_set_si(divisor, 2, MPFR_RNDN);
+		mpfr_pow_ui(divisor, divisor, nbits, MPFR_RNDN); // 2 ** nbits
+		mpfr_div(out, dividend, divisor, MPFR_RNDN);
+	}
+
+	void dgs_sample(mpz_t rop, mpfr_t sigma, mpfr_t c, size_t tau) {
+		dgs_disc_gauss_mp_t *dgs = dgs_disc_gauss_mp_init(sigma, c, tau, this);
+		dgs->call(rop, dgs);
+	}
+	
 };
 }
 /**@}*/

@@ -1,5 +1,6 @@
 #include "emp-tool/emp-tool.h"
 #include <iostream>
+
 using namespace std;
 using namespace emp;
 
@@ -29,6 +30,19 @@ int main() {
 	mpz_t integ;
 	mpz_init(integ);
 	prg.random_mpz(integ, 1024);//random number with 1024 bits.
+
+
+	// Verify that mpf_get_d produces numbers in [0, 1)
+	mpf_t real; // random real number with 1024 bits.
+	mpf_init(real);
+	for (int i = 0; i < 1000; i++) {
+		prg.random_mpf(real, 1024);
+		double result = mpf_get_d(real);
+		if ((result < 0) | (result >= 1)) {
+			cout << "Got invalid result from mpf_get_d" << result << endl;
+			return 1;
+		}
+	}
 
 	for (long long length = 2; length <= 8192; length*=2) {
 		long long times = 1024*1024*32/length;

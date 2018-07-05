@@ -9,8 +9,9 @@ include(cmake/threading.cmake)
 find_package(OpenSSL REQUIRED)
 find_package(relic REQUIRED)
 find_package(GMP REQUIRED)
+find_package(MPFR REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
-include_directories(${RELIC_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR} ${Boost_INCLUDE_DIRS} ${GMP_INCLUDE_DIR})
+include_directories(${RELIC_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR} ${Boost_INCLUDE_DIRS} ${GMP_INCLUDE_DIR} ${MPFR_INCLUDE_DIR})
 
 
 # Installation
@@ -39,3 +40,4 @@ add_test(int)
 add_test(float)
 add_test(garble)
 add_test(gen_circuit)
+add_test(dgs)
