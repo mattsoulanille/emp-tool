@@ -44,6 +44,12 @@ int main() {
 		}
 	}
 
+	cout << "DGS Samples: ";
+	for (int i = 0; i < 8; i++) {
+		cout << prg.dgs_sample(10, 0, 6) << ", ";
+	}
+	cout << endl;
+
 	for (long long length = 2; length <= 8192; length*=2) {
 		long long times = 1024*1024*32/length;
 		block * data = new block[length];

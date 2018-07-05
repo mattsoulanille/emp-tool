@@ -15,17 +15,21 @@
 #include <x86intrin.h>
 #endif
 
-
-
 namespace emp {
 	class PRG;
 }
-#ifndef DGS_H__
-#include "emp-tool/utils/dgs.h"
-#endif
+#include "emp-tool/utils/dgs_structs.h"
+dgs_disc_gauss_mp_t *dgs_disc_gauss_mp_init(const mpfr_t sigma, const mpfr_t c, size_t tau, emp::PRG *prg);
 
-	
 
+// used for checking if we need to build
+// a new instance of dgs_disc_gauss_mp_t
+// or if we can use the last call's one.
+struct dgs_params {
+	mpfr_t sigma;
+	mpfr_t c;
+	size_t tau;
+};
 
 /** @addtogroup BP
   @{
@@ -35,6 +39,8 @@ namespace emp {
 class PRG { public:
 	uint64_t counter = 0;
 	AES_KEY aes;
+	dgs_disc_gauss_mp_t * dgs_instance;
+	dgs_params dgs_instance_params;
 	PRG(const void * seed = nullptr, int id = 0) {	
 		if (seed != nullptr) {
 			reseed(seed, id);
@@ -206,11 +212,37 @@ class PRG { public:
 	}
 
 	void dgs_sample(mpz_t rop, mpfr_t sigma, mpfr_t c, size_t tau) {
-		dgs_disc_gauss_mp_t *dgs = dgs_disc_gauss_mp_init(sigma, c, tau, this);
-		dgs->call(rop, dgs);
+		if (! (dgs_instance &&
+		       mpfr_cmp(sigma, dgs_instance_params.sigma) == 0 &&
+		       mpfr_cmp(c, dgs_instance_params.c) == 0 &&
+		       tau == dgs_instance_params.tau) ) {
+			
+			dgs_instance = dgs_disc_gauss_mp_init(sigma, c, tau, this);
+		}
+		dgs_instance->call(rop, dgs_instance);
+	}
+	signed long int dgs_sample(double sigma, double c, size_t tau) {
+		mpfr_t sigma_mpfr, c_mpfr;
+		mpfr_init(sigma_mpfr);
+		mpfr_init(c_mpfr);
+		mpfr_set_d(sigma_mpfr, sigma, MPFR_RNDN);
+		mpfr_set_d(c_mpfr, c, MPFR_RNDN);
+		mpz_t out;
+		mpz_init(out);
+		dgs_sample(out, sigma_mpfr, c_mpfr, tau);
+		return mpz_get_si(out);
 	}
 	
 };
 }
+
+
+
+#ifndef DGS_H__
+#include "emp-tool/utils/dgs.h"
+#endif
+
+
+
 /**@}*/
 #endif// PRP_H__
