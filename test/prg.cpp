@@ -42,10 +42,10 @@ int main() {
 			cout << "Got invalid result from mpf_get_d" << result << endl;
 			return 1;
 		}
-	}
 
+	}
 	cout << "DGS Samples: ";
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < 10; i++) {
 		cout << prg.dgs_sample(10, 0, 6) << ", ";
 	}
 	cout << endl;

@@ -39,18 +39,6 @@
 #include <mpfr.h>
 #include <stdexcept>
 #include "emp-tool/utils/dgs_structs.h"
-//using namespace mpfr;
-
-// namespace emp {
-// 	class PRG {
-// 	public:
-// 		PRG(const void* seed, int id);
-// 		void random_mpz(mpz_t out, int length);
-// 		void random_mpfr(mpfr_t out, int nbits);
-// 	}
-// }
-
-
 
 dgs_bern_mp_t* dgs_bern_mp_init(mpfr_t p, emp::PRG *prg) {
 	/* we allow 0 and 1 here for low precision */

@@ -20,7 +20,7 @@ namespace emp {
 }
 #include "emp-tool/utils/dgs_structs.h"
 dgs_disc_gauss_mp_t *dgs_disc_gauss_mp_init(const mpfr_t sigma, const mpfr_t c, size_t tau, emp::PRG *prg);
-
+void dgs_disc_gauss_mp_clear(dgs_disc_gauss_mp_t *self);
 
 // used for checking if we need to build
 // a new instance of dgs_disc_gauss_mp_t
@@ -216,7 +216,11 @@ class PRG { public:
 		       mpfr_cmp(sigma, dgs_instance_params.sigma) == 0 &&
 		       mpfr_cmp(c, dgs_instance_params.c) == 0 &&
 		       tau == dgs_instance_params.tau) ) {
-			
+
+			if (dgs_instance) {
+				dgs_disc_gauss_mp_clear(dgs_instance);
+			}
+
 			dgs_instance = dgs_disc_gauss_mp_init(sigma, c, tau, this);
 		}
 		dgs_instance->call(rop, dgs_instance);
