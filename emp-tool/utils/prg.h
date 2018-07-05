@@ -59,6 +59,8 @@ class PRG { public:
 #endif
 			reseed(&v);
 		}
+		mpfr_init(dgs_instance_params.sigma);
+		mpfr_init(dgs_instance_params.c);
 	}
 	void reseed(const void * key, uint64_t id = 0) {
 		block v = _mm_loadu_si128((block*)key);
@@ -212,8 +214,7 @@ class PRG { public:
 	}
 
 	void dgs_sample(mpz_t rop, mpfr_t sigma, mpfr_t c, size_t tau) {
-		if (! (dgs_instance &&
-		       mpfr_cmp(sigma, dgs_instance_params.sigma) == 0 &&
+		if (! (mpfr_cmp(sigma, dgs_instance_params.sigma) == 0 &&
 		       mpfr_cmp(c, dgs_instance_params.c) == 0 &&
 		       tau == dgs_instance_params.tau) ) {
 
@@ -222,6 +223,9 @@ class PRG { public:
 			}
 
 			dgs_instance = dgs_disc_gauss_mp_init(sigma, c, tau, this);
+			mpfr_set(dgs_instance_params.sigma, sigma, MPFR_RNDN);
+			mpfr_set(dgs_instance_params.c, c, MPFR_RNDN);
+			dgs_instance_params.tau = tau;
 		}
 		dgs_instance->call(rop, dgs_instance);
 	}
