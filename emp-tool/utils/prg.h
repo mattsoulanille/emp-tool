@@ -183,21 +183,6 @@ class PRG { public:
 		}
 	}
 
-	// Post: sets 'out' to be a random mpf_t in [0, 1)
-	void random_mpf(mpf_t out, int nbits) {
-		mpz_t rop;
-		mpz_init(rop);
-		random_mpz(rop, nbits);
-		mpf_t dividend;
-		mpf_init(dividend);
-		mpf_set_z(dividend, rop);
-		mpf_t divisor;
-		mpf_init(divisor);
-		mpf_set_si(divisor, 2);
-		mpf_pow_ui(divisor, divisor, nbits); // 2 ** nbits
-		mpf_div(out, dividend, divisor);
-		
-	}
 	// similar to mpfr_urandomb
 	void random_mpfr(mpfr_t out, int nbits) {
 		mpz_t rop;
@@ -211,6 +196,12 @@ class PRG { public:
 		mpfr_set_si(divisor, 2, MPFR_RNDN);
 		mpfr_pow_ui(divisor, divisor, nbits, MPFR_RNDN); // 2 ** nbits
 		mpfr_div(out, dividend, divisor, MPFR_RNDN);
+
+		// Cleanup
+		mpz_clear(rop);
+		mpfr_clear(dividend);
+		mpfr_clear(divisor);
+
 	}
 
 	void dgs_sample(mpz_t rop, mpfr_t sigma, mpfr_t c, size_t tau) {
@@ -230,15 +221,25 @@ class PRG { public:
 		dgs_instance->call(rop, dgs_instance);
 	}
 	signed long int dgs_sample(double sigma, double c, size_t tau) {
+
 		mpfr_t sigma_mpfr, c_mpfr;
 		mpfr_init(sigma_mpfr);
 		mpfr_init(c_mpfr);
 		mpfr_set_d(sigma_mpfr, sigma, MPFR_RNDN);
 		mpfr_set_d(c_mpfr, c, MPFR_RNDN);
+
+		signed long int intResult;
 		mpz_t out;
 		mpz_init(out);
 		dgs_sample(out, sigma_mpfr, c_mpfr, tau);
-		return mpz_get_si(out);
+		intResult = mpz_get_si(out);
+
+		mpfr_clear(sigma_mpfr);
+		mpfr_clear(c_mpfr);
+		mpz_clear(out);
+
+
+		return intResult;
 	}
 	
 };
