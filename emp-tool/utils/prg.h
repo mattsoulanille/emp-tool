@@ -59,8 +59,19 @@ class PRG { public:
 #endif
 			reseed(&v);
 		}
+
 		mpfr_init(dgs_instance_params.sigma);
 		mpfr_init(dgs_instance_params.c);
+		mpz_init(tmp_z);
+		mpz_init(divisor_z);
+		mpfr_init(divisor);
+	}
+	~PRG() {
+		mpfr_clear(dgs_instance_params.sigma);
+		mpfr_clear(dgs_instance_params.c);
+		mpz_clear(tmp_z);
+		mpz_clear(divisor_z);
+		mpfr_clear(divisor);
 	}
 	void reseed(const void * key, uint64_t id = 0) {
 		block v = _mm_loadu_si128((block*)key);
@@ -185,23 +196,13 @@ class PRG { public:
 
 	// similar to mpfr_urandomb
 	void random_mpfr(mpfr_t out, int nbits) {
-		mpz_t rop;
-		mpz_init(rop);
-		random_mpz(rop, nbits);
-		mpfr_t dividend;
-		mpfr_init(dividend);
-		mpfr_set_z(dividend, rop, MPFR_RNDN);
-		mpfr_t divisor;
-		mpfr_init(divisor);
-		mpfr_set_si(divisor, 2, MPFR_RNDN);
-		mpfr_pow_ui(divisor, divisor, nbits, MPFR_RNDN); // 2 ** nbits
-		mpfr_div(out, dividend, divisor, MPFR_RNDN);
+		random_mpz(tmp_z, nbits);
+		mpfr_set_z(out, tmp_z, MPFR_RNDN);
 
-		// Cleanup
-		mpz_clear(rop);
-		mpfr_clear(dividend);
-		mpfr_clear(divisor);
+		mpz_ui_pow_ui(divisor_z, 2, (unsigned long int) nbits);
 
+		mpfr_set_z(divisor, divisor_z, MPFR_RNDN);
+		mpfr_div(out, out, divisor, MPFR_RNDN);
 	}
 
 	void dgs_sample(mpz_t rop, mpfr_t sigma, mpfr_t c, size_t tau) {
@@ -241,7 +242,9 @@ class PRG { public:
 
 		return intResult;
 	}
-	
+private:
+	mpz_t tmp_z, divisor_z;
+	mpfr_t divisor;
 };
 }
 
