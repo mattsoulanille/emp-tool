@@ -39,8 +39,6 @@ namespace emp {
 class PRG { public:
 	uint64_t counter = 0;
 	AES_KEY aes;
-	dgs_disc_gauss_mp_t * dgs_instance;
-	dgs_params dgs_instance_params;
 	PRG(const void * seed = nullptr, int id = 0) {	
 		if (seed != nullptr) {
 			reseed(seed, id);
@@ -195,11 +193,11 @@ class PRG { public:
 	}
 
 	// similar to mpfr_urandomb
-	void random_mpfr(mpfr_t out, int nbits) {
+	void random_mpfr(mpfr_t out, size_t nbits) {
 		random_mpz(tmp_z, nbits);
 		mpfr_set_z(out, tmp_z, MPFR_RNDN);
 
-		mpz_ui_pow_ui(divisor_z, 2, (unsigned long int) nbits);
+		mpz_ui_pow_ui(divisor_z, 2, nbits);
 
 		mpfr_set_z(divisor, divisor_z, MPFR_RNDN);
 		mpfr_div(out, out, divisor, MPFR_RNDN);
@@ -245,6 +243,9 @@ class PRG { public:
 private:
 	mpz_t tmp_z, divisor_z;
 	mpfr_t divisor;
+	dgs_disc_gauss_mp_t * dgs_instance;
+	dgs_params dgs_instance_params;
+
 };
 }
 
