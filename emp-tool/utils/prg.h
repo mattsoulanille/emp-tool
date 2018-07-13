@@ -58,6 +58,7 @@ class PRG { public:
 			reseed(&v);
 		}
 
+		dgs_instance = NULL;
 		mpfr_init(dgs_instance_params.sigma);
 		mpfr_init(dgs_instance_params.c);
 		mpz_init(tmp_z);
@@ -206,7 +207,8 @@ class PRG { public:
 	void dgs_sample(mpz_t rop, mpfr_t sigma, mpfr_t c, size_t tau) {
 		if (! (mpfr_cmp(sigma, dgs_instance_params.sigma) == 0 &&
 		       mpfr_cmp(c, dgs_instance_params.c) == 0 &&
-		       tau == dgs_instance_params.tau) ) {
+		       tau == dgs_instance_params.tau &&
+		       dgs_instance) ) {
 
 			if (dgs_instance) {
 				dgs_disc_gauss_mp_clear(dgs_instance);
