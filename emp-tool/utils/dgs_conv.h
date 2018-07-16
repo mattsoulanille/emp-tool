@@ -378,7 +378,7 @@ dgs_disc_gauss_mp_t *dgs_disc_gauss_mp_init(const mpfr_t sigma, const mpfr_t c, 
 
 			// we unroll the recursion on the coefficients on the fly
 			// so we don't have to use recursion during the call
-			int off = (1 << recursion_level - i - 1);
+			int off = (1 << (recursion_level - i - 1));
 			for (int j = 0; j < (1 << i); ++j) {
 				for (int k = 0; k < off; ++k) {
 					//~ self->coefficients[2*j*off + k] *= z1;
