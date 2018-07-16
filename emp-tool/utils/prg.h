@@ -250,7 +250,7 @@ private:
 
 
 #ifndef DGS_H__
-#include "emp-tool/utils/dgs.h"
+#include "emp-tool/utils/dgs_conv.h"
 #endif
 
 

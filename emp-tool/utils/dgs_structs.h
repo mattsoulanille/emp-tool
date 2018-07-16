@@ -37,6 +37,15 @@
 #include <math.h>
 #include <mpfr.h>
 
+typedef enum {
+              DGS_DISC_GAUSS_DEFAULT          = 0x0,  //<pick algorithm
+              DGS_DISC_GAUSS_UNIFORM_ONLINE   = 0x1,  //<call dgs_disc_gauss_mp_call_uniform_online
+              DGS_DISC_GAUSS_UNIFORM_TABLE    = 0x2,  //<call dgs_disc_gauss_mp_call_uniform_table
+              DGS_DISC_GAUSS_UNIFORM_LOGTABLE = 0x3,  //<call dgs_disc_gauss_mp_call_uniform_logtable
+              DGS_DISC_GAUSS_SIGMA2_LOGTABLE  = 0x7,  //<call dgs_disc_gauss_mp_call_sigma2_logtable
+              DGS_DISC_GAUSS_ALIAS            = 0x8,  //<call dgs_disc_gauss_mp_call_alias
+              DGS_DISC_GAUSS_CONVOLUTION      = 0x9,  //<call dgs_disc_gauss_mp_call_convolution
+} dgs_disc_gauss_alg_t;
 
 
 typedef struct {
@@ -216,6 +225,19 @@ typedef struct _dgs_disc_gauss_mp_t {
    
 	mpz_t* alias;
 	//dgs_bern_mp_t** bias;
+	dgs_bern_mp_t **bias;
+
+	/**
+	 * Base sampler for convolution
+	 */
+	struct _dgs_disc_gauss_mp_t *base_sampler;
+	size_t n_coefficients;
+	mpz_t *coefficients;
+
+	/**
+	 * Sampler to adjust center in convolution
+	 */
+	struct _dgs_disc_gauss_mp_t *coset_sampler;
 
 } dgs_disc_gauss_mp_t;
 
